@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const restify = require("restify");
 const mongoose = require("mongoose");
+const corsMiddleware = require("restify-cors-middleware");
 const environment_1 = require("../common/environment");
 class Server {
     initializeDb() {
@@ -25,6 +26,15 @@ class Server {
                 this.application.listen(environment_1.environment.server.port, () => {
                     resolve(this.application);
                 });
+                const corsOptions = {
+                    preflightMaxAge: 10,
+                    origins: ['*'],
+                    allowHeaders: ['authorization', 'Access-Control-Allow-Origin'],
+                    exposeHeaders: ['x-custom-header']
+                };
+                const cors = corsMiddleware(corsOptions);
+                this.application.pre(cors.preflight);
+                this.application.use(cors.actual);
             }
             catch (error) {
                 reject(error);
