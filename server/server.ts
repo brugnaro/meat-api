@@ -24,6 +24,17 @@ export class Server {
           version: '1.0.0'
         })
 
+        const corsOptions: corsMiddleware.Options = {
+          preflightMaxAge: 10,
+          origins: ['*'],
+          allowHeaders: ['authorization', 'Access-Control-Allow-Origin'],
+          exposeHeaders: ['x-custom-header']
+        }
+        const cors: corsMiddleware.CorsMiddleware = corsMiddleware(corsOptions)
+
+        this.application.pre(cors.preflight)
+        this.application.use(cors.actual)
+
         this.application.use(restify.plugins.queryParser())
         this.application.use(restify.plugins.bodyParser())
 
@@ -35,17 +46,6 @@ export class Server {
         this.application.listen(environment.server.port, () => {
           resolve(this.application)
         })
-
-        const corsOptions: corsMiddleware.Options = {
-          preflightMaxAge: 10,
-          origins: ['*'],
-          allowHeaders: ['authorization', 'Access-Control-Allow-Origin'],
-          exposeHeaders: ['x-custom-header']
-        }
-        const cors: corsMiddleware.CorsMiddleware = corsMiddleware(corsOptions)
-
-        this.application.pre(cors.preflight)
-        this.application.use(cors.actual)
 
       } catch (error) {
         reject(error)

@@ -18,15 +18,6 @@ class Server {
                     name: 'meat-api',
                     version: '1.0.0'
                 });
-                this.application.use(restify.plugins.queryParser());
-                this.application.use(restify.plugins.bodyParser());
-                //routes
-                for (let router of routers) {
-                    router.applyRoutes(this.application);
-                }
-                this.application.listen(environment_1.environment.server.port, () => {
-                    resolve(this.application);
-                });
                 const corsOptions = {
                     preflightMaxAge: 10,
                     origins: ['*'],
@@ -36,6 +27,15 @@ class Server {
                 const cors = corsMiddleware(corsOptions);
                 this.application.pre(cors.preflight);
                 this.application.use(cors.actual);
+                this.application.use(restify.plugins.queryParser());
+                this.application.use(restify.plugins.bodyParser());
+                //routes
+                for (let router of routers) {
+                    router.applyRoutes(this.application);
+                }
+                this.application.listen(environment_1.environment.server.port, () => {
+                    resolve(this.application);
+                });
             }
             catch (error) {
                 reject(error);
